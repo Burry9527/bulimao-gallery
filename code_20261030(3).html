@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>布狸猫 · COS摄影作品集</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --bg-0: #07111a;
+    --bg-1: #0c1a24;
+    --bg-2: #132533;
+    --accent: #7ef5d2;
+    --accent-2: #a5f3ff;
+    --pink: #ffb3d9;
+    --ink: #eaf6ff;
+    --muted: #9fb2c4;
+    --line: rgba(126, 245, 210, 0.25);
+    --card: rgba(19, 37, 51, 0.55);
+  }
+
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* 浮动光晕 */
+  .floating {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width: 260px; height: 260px; background: #7ef5d2; top: -80px; left: -80px; }
+  .blob-2 { width: 340px; height: 340px; background: #ffb3d9; bottom: -120px; right: -120px; }
+  .blob-3 { width: 200px; height: 200px; background: #a5f3ff; top: 40%; left: 55%; }
+
+  /* 符纸网格背景 */
+  .bg-pattern{
+    position: fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+    opacity: 0.35;
+    z-index:0;
+  }
+
+  /* ========== 封面页 ========== */
+  .cover-page{
+    position:fixed;
+    inset:0;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(126, 245, 210, 0.18), transparent 26%),
+      radial-gradient(circle at 85% 20%, rgba(255, 179, 217, 0.12), transparent 28%),
+      radial-gradient(circle at 50% 90%, rgba(165, 243, 255, 0.14), transparent 36%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .cover-page.hide{
+    opacity:0;
+    pointer-events:none;
+    transform:scale(1.05);
+  }
+  .cover-wrap{
+    text-align:center;
+    padding:30px;
+  }
+  .cover-img{
+    width:min(80vw, 600px);
+    max-height:60vh;
+    object-fit:cover;
+    border-radius:20px;
+    border:1px solid var(--line);
+    box-shadow: 0 0 30px rgba(126,245,210,0.25);
+    margin-bottom:28px;
+  }
+  .cover-title{
+    font-size:46px;
+    letter-spacing:12px;
+    color:#fff;
+    text-shadow: 0 0 18px rgba(126, 245, 210, 0.55),0 0 40px rgba(255, 179, 217, 0.25);
+    margin-bottom:10px;
+  }
+  .cover-sub{
+    color:var(--muted);
+    letter-spacing:4px;
+    margin-bottom:36px;
+  }
+  .enter-btn{
+    padding:12px 36px;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    background:rgba(126,245,210,0.08);
+    border-radius:999px;
+    font-size:16px;
+    letter-spacing:4px;
+    cursor:pointer;
+    transition:0.3s;
+  }
+  .enter-btn:hover{
+    background:rgba(126,245,210,0.22);
+    box-shadow:0 0 16px rgba(126,245,210,0.35);
+  }
+
+  /* ========== 作品集主页面 ========== */
+  .main-page{
+    position:relative;
+    z-index:1;
+    padding-bottom:80px;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(126, 245, 210, 0.18), transparent 26%),
+      radial-gradient(circle at 85% 20%, rgba(255, 179, 217, 0.12), transparent 28%),
+      radial-gradient(circle at 50% 90%, rgba(165, 243, 255, 0.14), transparent 36%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+    min-height:100vh;
+  }
+  header {
+    padding: 56px 20px 36px;
+    text-align: center;
+  }
+  .title-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 28px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(126, 245, 210, 0.12), rgba(255, 179, 217, 0.06));
+    backdrop-filter: blur(6px);
+    box-shadow:
+      0 0 0 1px rgba(126, 245, 210, 0.08) inset,
+      0 18px 45px rgba(0, 0, 0, 0.35);
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: var(--accent);
+  }
+  h1 {
+    font-size: 40px;
+    font-weight: 500;
+    letter-spacing: 10px;
+    color: #fff;
+    text-shadow:
+      0 0 18px rgba(126, 245, 210, 0.55),
+      0 0 40px rgba(255, 179, 217, 0.25);
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 4px;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .photo-card {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.35s ease;
+    position: relative;
+    backdrop-filter: blur(8px);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(126, 245, 210, 0.06) inset;
+  }
+  .photo-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 0 0, rgba(126, 245, 210, 0.22), transparent 30%),
+      radial-gradient(circle at 100% 100%, rgba(255, 179, 217, 0.18), transparent 30%);
+    opacity: 0;
+    transition: 0.35s ease;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .photo-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(126, 245, 210, 0.55);
+    box-shadow:
+      0 20px 45px rgba(0, 0, 0, 0.45),
+      0 0 24px rgba(126, 245, 210, 0.25);
+  }
+  .photo-card:hover::before {
+    opacity: 1;
+  }
+  .photo-card img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .photo-card:hover img {
+    transform: scale(1.06);
+  }
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: #6f8597;
+    font-size: 13px;
+    letter-spacing: 3px;
+    border-top: 1px dashed var(--line);
+    margin-top:60px;
+  }
+
+  /* ========== 大图预览（带左右翻页） ========== */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 12, 18, 0.92);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 100;
+  }
+  .lightbox.show {
+    display: flex;
+  }
+  .lightbox-content {
+    max-width: 96%;
+    max-height: 94vh;
+    position: relative;
+    text-align: center;
+  }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 86vh;
+    border-radius: 14px;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.6),
+      0 0 0 1px var(--line);
+  }
+  .close {
+    position: absolute;
+    top: 22px;
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(126, 245, 210, 0.12);
+    border: 1px solid var(--line);
+    color: var(--accent);
+    font-size: 24px;
+    line-height: 44px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.25s ease;
+  }
+  .close:hover {
+    background: rgba(126, 245, 210, 0.25);
+    transform: rotate(90deg);
+  }
+  .arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:rgba(126,245,210,0.1);
+    color:var(--accent);
+    font-size:24px;
+    cursor:pointer;
+    display:grid;
+    place-items:center;
+    transition:0.25s;
+    user-select:none;
+  }
+  .arrow:hover{
+    background:rgba(126,245,210,0.22);
+  }
+  .prev{ left:-60px; }
+  .next{ right:-60px; }
+
+  @media (max-width:720px){
+    .cover-title{ font-size:32px; }
+    h1{ font-size:30px; }
+    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:14px; }
+    .arrow{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="floating blob-1"></div>
+<div class="floating blob-2"></div>
+<div class="floating blob-3"></div>
+<div class="bg-pattern"></div>
+
+<!-- 封面入场页 -->
+<div class="cover-page" id="cover">
+  <div class="cover-wrap">
+    <img class="cover-img" src="cover.jpg" alt="封面氛围图">
+    <div class="cover-title">布狸猫</div>
+    <div class="cover-sub">COS摄影集 · 灵符灵铃主题</div>
+    <button class="enter-btn" id="enterBtn">进入图集</button>
+  </div>
+</div>
+
+<!-- 作品集主页面 -->
+<div class="main-page">
+  <header>
+    <div class="title-wrap">
+      <span class="eyebrow">COS PHOTOGRAPHY</span>
+      <h1>布狸猫</h1>
+      <span class="subtitle">灵 符 幽 铃 · 摄 影 集</span>
+    </div>
+  </header>
+  <div class="container">
+    <div class="gallery-grid" id="gallery">
+      <div class="photo-card" data-src="photo1.jpg">
+        <img src="photo1.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo2.jpg">
+        <img src="photo2.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo3.jpg">
+        <img src="photo3.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo4.jpg">
+        <img src="photo4.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo5.jpg">
+        <img src="photo5.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo6.jpg">
+        <img src="photo6.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo7.jpg">
+        <img src="photo7.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo8.jpg">
+        <img src="photo8.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo9.jpg">
+        <img src="photo9.jpg" alt="">
+      </div>
+      <div class="photo-card" data-src="photo10.jpg">
+        <img src="photo10.jpg" alt="">
+      </div>
+    </div>
+  </div>
+  <footer>
+    © 布狸猫 · COS摄影 | 页面主题灵感：崩坏星穹铁道 · 霍霍
+  </footer>
+</div>
+
+<!-- 大图弹窗 -->
+<div class="lightbox" id="lightbox">
+  <span class="close" id="closeBtn">✕</span>
+  <span class="arrow prev" id="prevBtn">‹</span>
+  <span class="arrow next" id="nextBtn">›</span>
+  <div class="lightbox-content">
+    <img id="lightImg" alt="预览图" />
+  </div>
+</div>
+
+<script>
+  const cover = document.getElementById("cover");
+  const enterBtn = document.getElementById("enterBtn");
+  const cards = Array.from(document.querySelectorAll(".photo-card"));
+  const lightbox = document.getElementById("lightbox");
+  const lightImg = document.getElementById("lightImg");
+  const closeBtn = document.getElementById("closeBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  let currentIndex = 0;
+
+  // 入场动画
+  enterBtn.onclick = ()=>{
+    cover.classList.add("hide");
+  }
+
+  // 打开大图
+  cards.forEach((card, idx) => {
+    card.addEventListener("click", () => {
+      currentIndex = idx;
+      lightImg.src = card.dataset.src;
+      lightbox.classList.add("show");
+    });
+  });
+
+  function closeLightbox() {
+    lightbox.classList.remove("show");
+  }
+  function prevImg(){
+    currentIndex = (currentIndex -1 + cards.length) % cards.length;
+    lightImg.src = cards[currentIndex].dataset.src;
+  }
+  function nextImg(){
+    currentIndex = (currentIndex +1) % cards.length;
+    lightImg.src = cards[currentIndex].dataset.src;
+  }
+
+  closeBtn.addEventListener("click", closeLightbox);
+  prevBtn.addEventListener("click", prevImg);
+  nextBtn.addEventListener("click", nextImg);
+  lightbox.addEventListener("click", e => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", e => {
+    if (!lightbox.classList.contains("show")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") prevImg();
+    if (e.key === "ArrowRight") nextImg();
+  });
+</script>
+</body>
+</html>
